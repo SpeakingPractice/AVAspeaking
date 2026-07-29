@@ -1,0 +1,6 @@
+{
+  "name": "IELTS Speaking Assistant",
+  "description": "Trợ lý luyện IELTS Speaking Band 7.0 theo từng Part và dạng câu hỏi với AI Coach",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
