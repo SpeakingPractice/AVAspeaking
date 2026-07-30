@@ -1,268 +1,214 @@
+import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { CoachResponse } from '../types';
 
-/**
- * Normalizes Vietnamese diacritics to clean printable characters for standard PDF fonts
- * to guarantee no character encoding corruption or missing glyphs in jsPDF.
- */
-function removeAccents(str: string): string {
-  return str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D');
-}
+export async function exportLessonToPDF(data: CoachResponse, question: string) {
+  // Create hidden DOM container for rendering full Vietnamese HTML export
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.width = '800px'; // Standard A4 ratio
+  container.style.backgroundColor = '#ffffff';
+  container.style.color = '#0f172a';
+  container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  container.style.padding = '36px';
+  container.style.boxSizing = 'border-box';
 
-export function exportLessonToPDF(data: CoachResponse, question: string) {
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
-  });
+  // Vocabulary Items HTML
+  const vocabularyHtml = (data.vocabulary || []).map((item, idx) => `
+    <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; page-break-inside: avoid;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <span style="font-weight: 700; font-size: 15px; color: #0d9488;">${idx + 1}. ${item.term}</span>
+        <span style="font-size: 11.5px; background-color: #e2e8f0; color: #334155; padding: 2px 8px; border-radius: 6px; font-weight: 600;">${item.type}</span>
+      </div>
+      <div style="font-weight: 700; font-size: 14px; color: #b45309; margin-bottom: 4px;">
+        Nghĩa: ${item.definition} <span style="font-weight: 400; font-size: 12px; color: #64748b;">(${item.pronunciation})</span>
+      </div>
+      <div style="font-style: italic; font-size: 13.5px; color: #334155; background-color: #ffffff; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        Ex: "${item.example}"
+      </div>
+    </div>
+  `).join('');
 
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 15;
-  const contentWidth = pageWidth - margin * 2;
-  let y = margin;
+  // Structure steps HTML
+  const structureHtml = (data.structureOutline || []).map((step, idx) => `
+    <div style="display: flex; gap: 12px; margin-bottom: 8px; align-items: flex-start;">
+      <span style="background-color: #4f46e5; color: #ffffff; font-weight: 700; font-size: 12.5px; padding: 3px 8px; border-radius: 6px; flex-shrink: 0; margin-top: 2px;">
+        Bước ${idx + 1}
+      </span>
+      <span style="font-size: 14.5px; color: #1e293b; line-height: 1.5;">${step}</span>
+    </div>
+  `).join('');
 
-  // Helper to add new page if needed
-  const checkPageBreak = (neededHeight: number) => {
-    if (y + neededHeight > pageHeight - margin) {
-      doc.addPage();
-      y = margin;
-      addPageHeaderFooter();
+  // Ideas HTML
+  const ideasHtml = (data.ideas && data.ideas.length > 0) ? `
+    <div style="margin-top: 20px; margin-bottom: 20px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: #4f46e5; margin-bottom: 10px; border-bottom: 2px solid #e0e7ff; padding-bottom: 6px;">
+        3. GỢI Ý HƯỚNG Ý TƯỞNG (Ideas & Talking Points)
+      </h3>
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+        ${data.ideas.map(idea => `
+          <div style="font-size: 14.5px; color: #334155; margin-bottom: 8px; line-height: 1.5; padding-left: 8px; border-left: 3px solid #818cf8;">
+            • ${idea}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  // Mistakes HTML
+  const mistakesHtml = (data.commonMistakes && data.commonMistakes.length > 0) ? `
+    <div style="margin-top: 20px; margin-bottom: 20px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: #e11d48; margin-bottom: 10px; border-bottom: 2px solid #ffe4e6; padding-bottom: 6px;">
+        6. LỖI THƯỜNG GẶP CẦN TRÁNH (Common Mistakes)
+      </h3>
+      ${data.commonMistakes.map(m => `
+        <div style="font-size: 14px; color: #9f1239; margin-bottom: 6px; line-height: 1.5; background-color: #fff1f2; padding: 8px 12px; border-radius: 8px; border: 1px solid #fecdd3;">
+          ⚠️ ${m}
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
+  // Follow up HTML
+  const followUpHtml = (data.followUpQuestions && data.followUpQuestions.length > 0) ? `
+    <div style="margin-top: 20px; margin-bottom: 20px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: #4f46e5; margin-bottom: 10px; border-bottom: 2px solid #e0e7ff; padding-bottom: 6px;">
+        7. CÂU HỎI MỞ RỘNG LUYỆN TẬP (Follow-up Questions)
+      </h3>
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+        ${data.followUpQuestions.map(q => `
+          <div style="font-size: 14.5px; color: #334155; margin-bottom: 6px; line-height: 1.5;">
+            • "${q}"
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  container.innerHTML = `
+    <!-- Top Branding -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4f46e5; padding-bottom: 10px; margin-bottom: 20px;">
+      <div>
+        <span style="font-weight: 800; font-size: 17px; color: #4f46e5;">IELTS SPEAKING COACH</span>
+        <span style="font-size: 13.5px; color: #64748b; margin-left: 8px; font-weight: 500;">| Kế Hoạch Bài Học & Từ Vựng Band 7.0+</span>
+      </div>
+      <span style="font-size: 12px; font-weight: 700; color: #059669; background-color: #d1fae5; border: 1px solid #a7f3d0; padding: 4px 12px; border-radius: 20px;">
+        Mục tiêu Band 7.0+
+      </span>
+    </div>
+
+    <!-- Title Banner -->
+    <div style="background-color: #1e293b; color: #ffffff; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+      <h1 style="font-size: 20px; font-weight: 800; margin: 0 0 6px 0; color: #ffffff; letter-spacing: 0.3px;">
+        KẾ HOẠCH BÀI HỌC SPEAKING - BAND 7.0
+      </h1>
+      <div style="font-size: 14px; color: #cbd5e1; font-weight: 500;">
+        ${data.part.toUpperCase()} | Dạng câu hỏi: ${data.questionType}
+      </div>
+    </div>
+
+    <!-- Target Question -->
+    <div style="background-color: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+      <div style="font-size: 12.5px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+        CÂU HỎI THỰC HÀNH (TARGET QUESTION):
+      </div>
+      <div style="font-size: 15.5px; font-weight: 700; color: #0f172a; line-height: 1.5; white-space: pre-wrap;">
+        "${question}"
+      </div>
+    </div>
+
+    <!-- Core Strategy -->
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 16px; font-weight: 700; color: #4f46e5; margin-bottom: 10px; border-bottom: 2px solid #e0e7ff; padding-bottom: 6px;">
+        1. CHIẾN LƯỢC TRẢ LỜI CỐT LÕI (Core Answer Strategy)
+      </h2>
+      <div style="font-size: 14.5px; color: #334155; line-height: 1.6; background-color: #faf5ff; border: 1px solid #e9d5ff; padding: 14px 16px; border-radius: 10px;">
+        ${data.questionStrategy}
+      </div>
+    </div>
+
+    <!-- Structure Outline -->
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 16px; font-weight: 700; color: #4f46e5; margin-bottom: 12px; border-bottom: 2px solid #e0e7ff; padding-bottom: 6px;">
+        2. CẤU TRÚC TRIỂN KHAI Ý (Response Structure Outline)
+      </h2>
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px;">
+        ${structureHtml}
+      </div>
+    </div>
+
+    <!-- Ideas -->
+    ${ideasHtml}
+
+    <!-- Target Vocabulary -->
+    ${data.vocabulary && data.vocabulary.length > 0 ? `
+      <div style="margin-top: 24px; margin-bottom: 24px;">
+        <h2 style="font-size: 16px; font-weight: 700; color: #059669; margin-bottom: 12px; border-bottom: 2px solid #a7f3d0; padding-bottom: 6px;">
+          4. BỘ TỪ VỰNG & COLLOCATIONS BAND 7.0+ (${data.vocabulary.length} cụm từ)
+        </h2>
+        ${vocabularyHtml}
+      </div>
+    ` : ''}
+
+    <!-- Sample Answer -->
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 16px; font-weight: 700; color: #4f46e5; margin-bottom: 12px; border-bottom: 2px solid #e0e7ff; padding-bottom: 6px;">
+        5. CÂU TRẢ LỜI MẪU BAND 7.0+ (Model Sample Answer)
+      </h2>
+      <div style="font-size: 14.5px; color: #1e1b4b; line-height: 1.7; background-color: #f0f3ff; border: 1px solid #c7d2fe; padding: 16px 18px; border-radius: 12px; white-space: pre-wrap;">
+        ${data.sampleAnswer}
+      </div>
+    </div>
+
+    <!-- Common Mistakes -->
+    ${mistakesHtml}
+
+    <!-- Follow Up -->
+    ${followUpHtml}
+
+    <!-- Footer -->
+    <div style="margin-top: 32px; border-top: 1px solid #e2e8f0; padding-top: 12px; text-align: center; font-size: 12px; color: #94a3b8;">
+      IELTS Speaking Coach • Tài liệu được tạo tự động cho luyện tập Band 7.0+
+    </div>
+  `;
+
+  document.body.appendChild(container);
+
+  try {
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff'
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const pdf = new jsPDF('p', 'mm', 'a4');
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfPageHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidth = pdfWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pdfPageHeight;
+
+    while (heightLeft > 0) {
+      position -= pdfPageHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pdfPageHeight;
     }
-  };
 
-  const addPageHeaderFooter = () => {
-    // Header line
-    doc.setFontSize(8);
-    doc.setTextColor(120, 120, 120);
-    doc.text('IELTS Speaking Coach • Band 7.0 Strategy & Lesson Plan', margin, 10);
-    doc.setDrawColor(220, 220, 220);
-    doc.line(margin, 12, pageWidth - margin, 12);
-  };
-
-  addPageHeaderFooter();
-  y = 18;
-
-  // Document Title Banner
-  doc.setFillColor(30, 41, 59); // Dark slate
-  doc.rect(margin, y, contentWidth, 22, 'F');
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.setTextColor(255, 255, 255);
-  doc.text('IELTS SPEAKING COACH - BAND 7.0 LESSON PLAN', margin + 6, y + 9);
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(203, 213, 225);
-  doc.text(
-    `${data.part.toUpperCase()} | Question Type: ${removeAccents(data.questionType)} | Band 7.0 Target`,
-    margin + 6,
-    y + 16
-  );
-
-  y += 28;
-
-  // Target Question Section
-  doc.setFillColor(241, 245, 249); // Slate-100
-  doc.setDrawColor(203, 213, 225);
-  doc.roundedRect(margin, y, contentWidth, 18, 2, 2, 'FD');
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(71, 85, 105);
-  doc.text('TARGET QUESTION:', margin + 4, y + 6);
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(15, 23, 42);
-  const cleanQuestion = removeAccents(question);
-  const splitQ = doc.splitTextToSize(`"${cleanQuestion}"`, contentWidth - 8);
-  doc.text(splitQ, margin + 4, y + 12);
-
-  y += 24;
-
-  // Core Strategy
-  checkPageBreak(25);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(79, 70, 229); // Indigo
-  doc.text('1. CORE ANSWER STRATEGY (Chien Luoc Tra Loi)', margin, y);
-  y += 5;
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(51, 65, 85);
-  const cleanStrategy = removeAccents(data.questionStrategy);
-  const splitStrategy = doc.splitTextToSize(cleanStrategy, contentWidth);
-  doc.text(splitStrategy, margin, y);
-  y += splitStrategy.length * 4.5 + 6;
-
-  // Structure Outline
-  checkPageBreak(30);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(79, 70, 229);
-  doc.text('2. RESPONSE STRUCTURE OUTLINE (Cau Truc Trien Khai)', margin, y);
-  y += 6;
-
-  data.structureOutline.forEach((step, idx) => {
-    checkPageBreak(10);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(15, 23, 42);
-    doc.text(`Step ${idx + 1}:`, margin + 2, y);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(51, 65, 85);
-    const cleanStep = removeAccents(step);
-    const splitStep = doc.splitTextToSize(cleanStep, contentWidth - 18);
-    doc.text(splitStep, margin + 18, y);
-    y += Math.max(splitStep.length * 4.5, 6);
-  });
-  y += 4;
-
-  // Ideas & Directions
-  if (data.ideas && data.ideas.length > 0) {
-    checkPageBreak(25);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(79, 70, 229);
-    doc.text('3. IDEAS & TALKING POINTS (Goi Y Huong Y Tuong)', margin, y);
-    y += 6;
-
-    data.ideas.forEach((idea) => {
-      checkPageBreak(8);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(51, 65, 85);
-      const cleanIdea = removeAccents(idea);
-      const splitIdea = doc.splitTextToSize(`• ${cleanIdea}`, contentWidth - 4);
-      doc.text(splitIdea, margin + 2, y);
-      y += splitIdea.length * 4.5 + 2;
-    });
-    y += 4;
+    const fileName = `IELTS_Speaking_${(data.part || 'Lesson').replace(/\s+/g, '_')}_Plan.pdf`;
+    pdf.save(fileName);
+  } finally {
+    document.body.removeChild(container);
   }
-
-  // Band 7.0 Target Vocabulary Table
-  if (data.vocabulary && data.vocabulary.length > 0) {
-    checkPageBreak(35);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(5, 150, 105); // Emerald green
-    doc.text(`4. BAND 7.0 TARGET VOCABULARY & COLLOCATIONS (${data.vocabulary.length} Items)`, margin, y);
-    y += 6;
-
-    data.vocabulary.forEach((item, idx) => {
-      checkPageBreak(22);
-
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(226, 232, 240);
-      doc.roundedRect(margin, y, contentWidth, 18, 1.5, 1.5, 'FD');
-
-      // Term & Type
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9.5);
-      doc.setTextColor(13, 148, 136); // Teal
-      doc.text(`${idx + 1}. ${item.term}`, margin + 3, y + 5);
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      doc.setTextColor(100, 116, 139);
-      doc.text(`(${item.type})`, margin + 65, y + 5);
-
-      // Definition
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8.5);
-      doc.setTextColor(180, 83, 9); // Amber
-      const cleanDef = removeAccents(item.definition);
-      doc.text(`Nghia: ${cleanDef}`, margin + 3, y + 10);
-
-      // Example
-      doc.setFont('helvetica', 'italic');
-      doc.setFontSize(8);
-      doc.setTextColor(71, 85, 105);
-      const cleanEx = removeAccents(item.example);
-      const splitEx = doc.splitTextToSize(`Ex: "${cleanEx}"`, contentWidth - 6);
-      doc.text(splitEx[0], margin + 3, y + 15);
-
-      y += 21;
-    });
-    y += 4;
-  }
-
-  // Model Sample Answer
-  checkPageBreak(40);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(79, 70, 229);
-  doc.text('5. BAND 7.0 MODEL SAMPLE ANSWER (Cau Tra Loi Mau)', margin, y);
-  y += 6;
-
-  doc.setFillColor(238, 242, 255); // Indigo light
-  doc.setDrawColor(199, 210, 254);
-  const cleanSample = removeAccents(data.sampleAnswer);
-  const splitSample = doc.splitTextToSize(cleanSample, contentWidth - 8);
-  const boxHeight = splitSample.length * 4.5 + 8;
-
-  checkPageBreak(boxHeight + 5);
-  doc.roundedRect(margin, y, contentWidth, boxHeight, 2, 2, 'FD');
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(30, 27, 75);
-  doc.text(splitSample, margin + 4, y + 6);
-
-  y += boxHeight + 8;
-
-  // Common Mistakes
-  if (data.commonMistakes && data.commonMistakes.length > 0) {
-    checkPageBreak(25);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(225, 29, 72); // Rose red
-    doc.text('6. COMMON MISTAKES TO AVOID (Loi Thuong Gap)', margin, y);
-    y += 6;
-
-    data.commonMistakes.forEach((mistake) => {
-      checkPageBreak(8);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      doc.setTextColor(159, 18, 57);
-      const cleanMistake = removeAccents(mistake);
-      const splitM = doc.splitTextToSize(`• ${cleanMistake}`, contentWidth - 4);
-      doc.text(splitM, margin + 2, y);
-      y += splitM.length * 4 + 2;
-    });
-    y += 4;
-  }
-
-  // Follow up questions
-  if (data.followUpQuestions && data.followUpQuestions.length > 0) {
-    checkPageBreak(20);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(79, 70, 229);
-    doc.text('7. FOLLOW-UP PRACTICE QUESTIONS (Cau Hoi Mo Rong)', margin, y);
-    y += 6;
-
-    data.followUpQuestions.forEach((q) => {
-      checkPageBreak(8);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      doc.setTextColor(51, 65, 85);
-      const cleanQ = removeAccents(q);
-      const splitFQ = doc.splitTextToSize(`• "${cleanQ}"`, contentWidth - 4);
-      doc.text(splitFQ, margin + 2, y);
-      y += splitFQ.length * 4 + 2;
-    });
-  }
-
-  // Save the PDF file
-  const fileName = `IELTS_Speaking_${data.part.replace(/\s+/g, '_')}_Lesson.pdf`;
-  doc.save(fileName);
 }

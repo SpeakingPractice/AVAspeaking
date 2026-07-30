@@ -178,5 +178,60 @@ export const VAULT_TOPIC_VOCABULARY: VaultVocabItem[] = [
   // Work & Career
   { term: 'climb the corporate ladder', type: 'idiom', definition: 'thăng tiến trong nấc thang sự nghiệp', pronunciation: '/klaɪm ðə ˈkɔː.pər.ət ˈlæd.ər/', example: 'Ambitious young professionals strive to climb the corporate ladder.', topic: 'Work & Career' },
   { term: 'strike a healthy work-life balance', type: 'collocation', definition: 'cân bằng lành mạnh công việc và cuộc sống', pronunciation: '/straɪk ə ˈhel.θi wɜːk laɪf ˈbæl.əns/', example: 'It is essential to strike a healthy work-life balance to prevent burnout.', topic: 'Work & Career' },
-  { term: 'hone my professional skills', type: 'collocation', definition: 'rèn giũa kỹ năng nghề nghiệp', pronunciation: '/həʊn maɪ prəˈfeʃ.ən.əl skɪlz/', example: 'Taking specialized online courses helps hone my professional skills.', topic: 'Work & Career' }
+  { term: 'hone my professional skills', type: 'collocation', definition: 'rèn giũa kỹ năng nghề nghiệp', pronunciation: '/həʊn maɪ prəˈfeʃ.ən.əl skɪlz/', example: 'Taking specialized online courses helps hone my professional skills.', topic: 'Work & Career' },
+
+  // Parties
+  { term: 'throw a party', type: 'phrasal verb', definition: 'tổ chức một bữa tiệc', pronunciation: '/θrəʊ ə ˈpɑː.ti/', example: 'My friends decided to throw a surprise party for my birthday.', topic: 'Parties' },
+  { term: 'the life of the party', type: 'idiom', definition: 'người sôi nổi, tâm điểm của bữa tiệc', pronunciation: '/ðə laɪf əv ðə ˈpɑː.ti/', example: 'With his great sense of humor, Tom is always the life of the party.', topic: 'Parties' },
+  { term: 'let your hair down', type: 'idiom', definition: 'xả hơi, quẩy hết mình', pronunciation: '/let jɔː heər daʊn/', example: 'Parties are a fantastic opportunity to let your hair down after a stressful week.', topic: 'Parties' },
+
+  // Drawing
+  { term: 'unleash creativity', type: 'collocation', definition: 'bộc lộ / giải phóng sức sáng tạo', pronunciation: '/ʌnˈliːʃ ˌkriː.eɪˈtɪv.ə.ti/', example: 'Drawing gives children a wonderful chance to unleash their creativity.', topic: 'Drawing' },
+  { term: 'doodle around', type: 'phrasal verb', definition: 'vẽ ngoằn ngoèo / vẽ nháp thư giãn', pronunciation: '/ˈduː.dəl əˈraʊnd/', example: 'I often doodle around on my notebook during long phone calls.', topic: 'Drawing' },
+  { term: 'visual expression', type: 'collocation', definition: 'sự thể hiện bằng hình ảnh', pronunciation: '/ˈvɪʒ.u.əl ɪkˈspreʃ.ən/', example: 'Painting and drawing serve as a powerful form of visual expression.', topic: 'Drawing' },
+
+  // Meeting Friends
+  { term: 'catch up with', type: 'phrasal verb', definition: 'gặp mặt hàn huyên / cập nhật tin tức', pronunciation: '/kætʃ ʌp wɪð/', example: 'I love meeting my old classmates at a cafe to catch up with each other.', topic: 'Meeting Friends' },
+  { term: 'hang out at', type: 'phrasal verb', definition: 'tụ tập, đi chơi ở', pronunciation: '/hæŋ aʊt æt/', example: 'We usually hang out at a cozy coffee shop near the city center.', topic: 'Meeting Friends' },
+  { term: 'a tight circle of friends', type: 'collocation', definition: 'nhóm bạn thân thiết gắn bó', pronunciation: '/ə taɪt ˈsɜː.kəl əv frendz/', example: 'I prefer having a tight circle of friends rather than hundreds of acquaintances.', topic: 'Meeting Friends' },
+
+  // Weekend Habits
+  { term: 'sleep in', type: 'phrasal verb', definition: 'ngủ nướng muộn hơn thường ngày', pronunciation: '/sliːp ɪn/', example: 'On Saturdays, I usually sleep in until 9 AM to recharge my batteries.', topic: 'Weekend Habits' },
+  { term: 'unwind after work', type: 'collocation', definition: 'thư giãn sau thời gian làm việc', pronunciation: '/ˌʌnˈwaɪnd ˈɑːf.tər wɜːk/', example: 'Spending quiet weekends reading books helps me unwind after work.', topic: 'Weekend Habits' },
+  { term: 'a change of scenery', type: 'idiom', definition: 'đổi gió / đổi không khí', pronunciation: '/ə tʃeɪndʒ əv ˈsiː.nər.i/', example: 'Taking a weekend road trip provides a refreshing change of scenery.', topic: 'Weekend Habits' },
+
+  // Laugh & Humor
+  { term: 'burst into laughter', type: 'collocation', definition: 'bật cười nấc nẻ / cười phá lên', pronunciation: '/bɜːst ˈɪn.tuː ˈlɑːf.tər/', example: 'The entire room burst into laughter when he told that witty joke.', topic: 'Laugh & Humor' },
+  { term: 'tickle one’s funny bone', type: 'idiom', definition: 'gây cười / chọc đúng chỗ buồn cười', pronunciation: '/ˈtɪk.əl wʌnz ˈfʌn.i bəʊn/', example: 'Stand-up comedy shows always tickle my funny bone.', topic: 'Laugh & Humor' },
+  { term: 'infectious laugh', type: 'collocation', definition: 'tiếng cười giòn tan có sức lan tỏa', pronunciation: '/ɪnˈfek.ʃəs lɑːf/', example: 'She has an infectious laugh that brightens up the whole room.', topic: 'Laugh & Humor' },
+
+  // City Life
+  { term: 'fast-paced lifestyle', type: 'collocation', definition: 'nhịp sống nhanh, hối hả', pronunciation: '/fɑːst peɪst ˈlaɪf.staɪl/', example: 'Living in a metropolis means getting used to a fast-paced lifestyle.', topic: 'City Life' },
+  { term: 'convenient amenities', type: 'collocation', definition: 'tiện ích sinh hoạt thuận tiện', pronunciation: '/kənˈviː.ni.ənt əˈmiː.nə.tiz/', example: 'Cities offer easy access to modern, convenient amenities.', topic: 'City Life' },
+  { term: 'hustle and bustle', type: 'idiom', definition: 'sự nhộn nhịp, hối hả của đô thị', pronunciation: '/ˈhʌs.əl ænd ˈbʌs.əl/', example: 'I sometimes visit the countryside to escape the hustle and bustle of city life.', topic: 'City Life' },
+
+  // Maps & Navigation
+  { term: 'get one’s bearings', type: 'idiom', definition: 'xác định vị trí / định hình phương hướng', pronunciation: '/ɡet wʌnz ˈbeə.rɪŋz/', example: 'I always check my digital map app to get my bearings in a new city.', topic: 'Maps & Navigation' },
+  { term: 'find one’s way around', type: 'phrasal verb', definition: 'tìm đường đi xung quanh', pronunciation: '/faɪnd wʌnz weɪ əˈraʊnd/', example: 'Google Maps makes it so effortless to find your way around unfamiliar streets.', topic: 'Maps & Navigation' },
+  { term: 'lose one’s sense of direction', type: 'collocation', definition: 'mất phương hướng / mù đường', pronunciation: '/luːz wʌnz sens əv daɪˈrek.ʃən/', example: 'Without GPS navigation, it is easy to lose your sense of direction.', topic: 'Maps & Navigation' },
+
+  // Noise
+  { term: 'deafening noise', type: 'collocation', definition: 'tiếng ồn điếc tai', pronunciation: '/ˈdef.ən.ɪŋ nɔɪz/', example: 'Construction sites nearby generate deafening noise throughout the morning.', topic: 'Noise' },
+  { term: 'blare out', type: 'phrasal verb', definition: 'phát ra âm thanh / nhạc rất to', pronunciation: '/bleər aʊt/', example: 'Loud speakers often blare out music in crowded night markets.', topic: 'Noise' },
+  { term: 'a peaceful sanctuary', type: 'collocation', definition: 'nơi trú ẩn yên tĩnh, bình yên', pronunciation: '/ə ˈpiːs.fəl ˈsæŋk.tʃʊə.ri/', example: 'The public library is my peaceful sanctuary when I need to study quietly.', topic: 'Noise' },
+
+  // Transportation
+  { term: 'commute to work', type: 'collocation', definition: 'di chuyển đi làm hàng ngày', pronunciation: '/kəˈmjuːt tuː wɜːk/', example: 'Taking the subway is the fastest way to commute to work in peak hours.', topic: 'Transportation' },
+  { term: 'stuck in traffic jams', type: 'idiom', definition: 'bị kẹt trong đám tắc đường', pronunciation: '/stʌk ɪn ˈtræf.ɪk dʒæmz/', example: 'Commuters frequently get stuck in traffic jams during rush hour.', topic: 'Transportation' },
+  { term: 'a reliable transit system', type: 'collocation', definition: 'hệ thống giao thông công cộng tin cậy', pronunciation: '/ə rɪˈlaɪ.ə.bəl ˈtræn.zɪt ˈsɪs.təm/', example: 'A reliable transit system reduces reliance on private vehicles.', topic: 'Transportation' },
+
+  // Tea or Coffee
+  { term: 'savor the flavor', type: 'collocation', definition: 'thưởng thức nhâm nhi hương vị', pronunciation: '/ˈseɪ.vər ðə ˈfleɪ.vər/', example: 'I love to sit by the window and savor the rich flavor of hot coffee.', topic: 'Tea or Coffee' },
+  { term: 'get a caffeine boost', type: 'collocation', definition: 'nạp năng lượng từ caffeine', pronunciation: '/ɡet ə ˈkæf.iːn buːst/', example: 'An espresso in the afternoon gives me a much-needed caffeine boost.', topic: 'Tea or Coffee' },
+  { term: 'a social tradition', type: 'collocation', definition: 'nét văn hóa giao tiếp xã hội', pronunciation: '/ə ˈsəʊ.ʃəl trəˈdɪʃ.ən/', example: 'Drinking green tea with guests is a cherished social tradition in Vietnam.', topic: 'Tea or Coffee' },
+
+  // Fish & Marine Life
+  { term: 'marine ecosystem', type: 'collocation', definition: 'hệ sinh thái biển', pronunciation: '/məˈriːn ˈiː.kəʊˌsɪs.təm/', example: 'Coral reefs play a vital role in preserving the global marine ecosystem.', topic: 'Fish & Marine Life' },
+  { term: 'aquatic life', type: 'collocation', definition: 'sinh vật / đời sống dưới nước', pronunciation: '/əˈkwæt.ɪk laɪf/', example: 'Visiting aquariums allows children to observe fascinating aquatic life.', topic: 'Fish & Marine Life' },
+  { term: 'a relaxing pastime', type: 'collocation', definition: 'trò tiêu khiển thư giãn', pronunciation: '/ə rɪˈlæk.sɪŋ ˈpɑːs.taɪm/', example: 'Fishing at a tranquil lake is a popular relaxing pastime for many adults.', topic: 'Fish & Marine Life' }
 ];

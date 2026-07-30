@@ -60,14 +60,15 @@ export const CoachResultView: React.FC<CoachResultViewProps> = ({
     setTimeout(() => setCopiedSample(false), 2000);
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     setIsExportingPDF(true);
     try {
-      exportLessonToPDF(data, question);
+      await exportLessonToPDF(data, question);
     } catch (err) {
       console.error('Lỗi khi xuất PDF:', err);
+      alert('Không thể tạo PDF. Vui lòng thử lại.');
     } finally {
-      setTimeout(() => setIsExportingPDF(false), 800);
+      setIsExportingPDF(false);
     }
   };
 

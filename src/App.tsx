@@ -6,7 +6,7 @@ import { VocabularyVault } from './components/VocabularyVault';
 import { HistoryView } from './components/HistoryView';
 import { ApiKeyModal } from './components/ApiKeyModal';
 import { CoachResponse, PracticeHistoryItem, IELTSPart } from './types';
-import { Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Sparkles, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'generator' | 'vocabulary' | 'history'>('generator');
@@ -91,9 +91,53 @@ export default function App() {
     }
   }, [historyItems]);
 
+  const [lastPayload, setLastPayload] = useState<{
+    question: string;
+    part: IELTSPart;
+    questionTypeId?: string;
+    customContext?: string;
+  } | null>(null);
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // Safe API fetcher with automatic retry for cold-start HTML gateway responses
+  const fetchWithRetry = async (url: string, options: RequestInit, retries = 2): Promise<any> => {
+    let lastError: Error = new Error('Kết nối thất bại');
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        if (attempt > 0) {
+          // Wait 1.2s before retry
+          await new Promise((resolve) => setTimeout(resolve, 1200));
+        }
+
+        const response = await fetch(url, options);
+        const contentType = response.headers.get('content-type') || '';
+
+        if (!contentType.includes('application/json')) {
+          // Sever returned HTML (e.g. 502/503 Cloud Run warming up page)
+          throw new Error('Máy chủ AI đang khởi động lại. Hệ thống đang tự động thử lại...');
+        }
+
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Máy chủ phản hồi lỗi không xác định.');
+        }
+
+        return data;
+      } catch (err: any) {
+        lastError = err;
+      }
+    }
+
+    throw new Error(
+      lastError.message.includes('JSON') || lastError.message.includes('khởi động')
+        ? 'Máy chủ AI vừa khởi động lại (Mã 502/503). Vui lòng bấm "Thử lại" bên dưới.'
+        : lastError.message
+    );
   };
 
   // Trigger Speaking Coach Analysis API
@@ -107,6 +151,7 @@ export default function App() {
     setErrorMessage(null);
     setCoachResponse(null);
     setCurrentQuestion(payload.question);
+    setLastPayload(payload);
 
     try {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -114,24 +159,11 @@ export default function App() {
         headers['x-gemini-api-key'] = userApiKey.trim();
       }
 
-      const response = await fetch('/api/speaking-coach', {
+      const data = await fetchWithRetry('/api/speaking-coach', {
         method: 'POST',
         headers,
         body: JSON.stringify(payload),
       });
-
-      const contentType = response.headers.get('content-type') || '';
-      let data: any;
-      if (contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        const text = await response.text();
-        throw new Error(`Máy chủ chưa sẵn sàng hoặc phản hồi không đúng định dạng JSON (Mã ${response.status}). Vui lòng bấm thử lại sau vài giây.`);
-      }
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Không thể lấy dữ liệu phản hồi từ AI Coach.');
-      }
 
       setCoachResponse(data.data);
       setCurrentPart(data.data.part || 'Part 1');
@@ -230,12 +262,24 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Error Alert */}
         {errorMessage && (
-          <div className="p-4 bg-rose-950/40 border border-rose-800/60 rounded-2xl text-xs text-rose-200 flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
-            <div>
-              <span className="font-bold block text-rose-300">Thông báo lỗi:</span>
-              {errorMessage}
+          <div className="p-4 bg-rose-950/40 border border-rose-800/60 rounded-2xl text-xs text-rose-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+              <div>
+                <span className="font-bold block text-rose-300">Thông báo kết nối:</span>
+                {errorMessage}
+              </div>
             </div>
+            {lastPayload && (
+              <button
+                onClick={() => handleAnalyzeQuestion(lastPayload)}
+                disabled={isLoadingCoach}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-semibold rounded-xl flex items-center gap-2 shrink-0 transition-all cursor-pointer text-xs"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoadingCoach ? 'animate-spin' : ''}`} />
+                {isLoadingCoach ? 'Đang thử lại...' : 'Thử lại ngay'}
+              </button>
+            )}
           </div>
         )}
 

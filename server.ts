@@ -316,6 +316,19 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
+// Global Express Error Handler - Always return JSON for API routes
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Express Unhandled Error:', err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(err.status || 500).json({
+    success: false,
+    error: err.message || 'Lỗi xử lý hệ thống nội bộ.',
+    details: process.env.NODE_ENV !== 'production' ? String(err) : undefined
+  });
+});
+
 // Start Server with Vite Middleware in Dev
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
