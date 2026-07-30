@@ -120,10 +120,17 @@ export default function App() {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get('content-type') || '';
+      let data: any;
+      if (contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        throw new Error(`Máy chủ chưa sẵn sàng hoặc phản hồi không đúng định dạng JSON (Mã ${response.status}). Vui lòng bấm thử lại sau vài giây.`);
+      }
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to fetch AI Coach response');
+        throw new Error(data.error || 'Không thể lấy dữ liệu phản hồi từ AI Coach.');
       }
 
       setCoachResponse(data.data);

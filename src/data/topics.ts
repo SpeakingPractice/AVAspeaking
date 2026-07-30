@@ -980,5 +980,313 @@ export const TOPIC_PRESETS: TopicPreset[] = [
       'What qualities make a person a successful manager or leader?',
       'How is technology changing the skills needed for future jobs?'
     ]
+  },
+  {
+    id: 'parties',
+    topicName: 'Parties',
+    topicVi: 'Tiệc tùng & Buổi tiệc',
+    icon: 'GlassWater',
+    part1Questions: [
+      'Do you enjoy going to parties?',
+      'How often do you attend parties or social gatherings?',
+      'What kind of parties do you prefer (e.g., birthday, dinner party)?',
+      'Do you prefer hosting a party or being a guest?'
+    ],
+    part2CueCards: [
+      {
+        title: 'Describe a memorable party you recently attended.',
+        bulletPoints: [
+          'What party it was and where it took place',
+          'Who was there with you',
+          'What activities or food were provided',
+          'And explain why this party was memorable to you'
+        ]
+      }
+    ],
+    part3Questions: [
+      'Why do people like to celebrate special occasions with parties?',
+      'What elements make a social party successful in your opinion?',
+      'Do you think music and games are essential for a good party?'
+    ]
+  },
+  {
+    id: 'drawing',
+    topicName: 'Drawing',
+    topicVi: 'Vẽ tranh & Phác thảo',
+    icon: 'Palette',
+    part1Questions: [
+      'Did you enjoy drawing when you were a child?',
+      'Do you ever draw or paint nowadays?',
+      'What kind of things do you like to draw?',
+      'Is drawing a useful skill for young children to learn?'
+    ],
+    part2CueCards: [
+      {
+        title: 'Describe a drawing or painting that you remember well.',
+        bulletPoints: [
+          'What it depicted',
+          'Who drew or painted it',
+          'Where you saw it',
+          'And explain how you felt when looking at it'
+        ]
+      }
+    ],
+    part3Questions: [
+      'How does learning to draw help develop imagination and creativity in children?',
+      'Why do some people prefer hand-drawn artwork over digital illustrations?',
+      'Should schools invest more resources into teaching visual arts?'
+    ]
+  },
+  {
+    id: 'meet_friends',
+    topicName: 'Meeting Friends',
+    topicVi: 'Gặp gỡ bạn bè',
+    icon: 'Users',
+    part1Questions: [
+      'How often do you meet up with your friends?',
+      'What do you usually do when you meet your friends?',
+      'Do you prefer meeting friends individually or in a big group?',
+      'Where is your favorite place to hang out with friends?'
+    ],
+    part2CueCards: [
+      {
+        title: 'Describe a time when you had a fun time meeting up with friends.',
+        bulletPoints: [
+          'Who you met and where you met',
+          'What activities you did together',
+          'What you talked about',
+          'And explain why it was an enjoyable meeting'
+        ]
+      }
+    ],
+    part3Questions: [
+      'How do modern social media platforms affect face-to-face friendships?',
+      'What qualities are most important in maintaining a long-lasting friendship?',
+      'Is it easier to make genuine new friends as a child or as an adult?'
+    ]
+  },
+  {
+    id: 'weekend_habits',
+    topicName: 'Weekend Habits',
+    topicVi: 'Thói quen cuối tuần',
+    icon: 'Calendar',
+    part1Questions: [
+      'What do you usually do on weekends?',
+      'Do you prefer to relax at home or go out on weekends?',
+      'Did you have similar weekend routines when you were a child?',
+      'What is your favorite day of the weekend, Saturday or Sunday?'
+    ],
+    part2CueCards: [
+      {
+        title: 'Describe a perfect weekend you recently spent.',
+        bulletPoints: [
+          'What you did and where you went',
+          'Who you spent time with',
+          'Why you chose to spend your weekend this way',
+          'And explain why it was a perfect weekend for you'
+        ]
+      }
+    ],
+    part3Questions: [
+      'Why is it important for working professionals to have a good work-life balance on weekends?',
+      'Do people in your country tend to spend weekends differently now compared to the past?',
+      'Should companies adopt a 4-day work week to give employees longer weekends?'
+    ]
+  },
+  {
+    id: 'laugh',
+    topicName: 'Laugh & Humor',
+    topicVi: 'Tiếng cười & Hài hước',
+    icon: 'Laugh',
+    part1Questions: [
+      'Do you laugh often?',
+      'What kind of things usually make you laugh?',
+      'Who is the funniest person you know?',
+      'Do you think laughter is good for health?'
+    ],
+    part2CueCards: [
+      {
+        title: 'Describe a situation or event that made you laugh out loud.',
+        bulletPoints: [
+          'When and where it happened',
+          'Who you were with',
+          'What caused you to laugh so much',
+          'And explain how you felt after that laughter'
+        ]
+      }
+    ],
+    part3Questions: [
+      'Why is humor considered an effective way to relieve mental stress?',
+      'Can humor be used effectively in education or business presentations?',
+      'Do people from different cultural backgrounds appreciate different types of humor?'
+    ]
+  },
+  {
+    id: 'city',
+    topicName: 'City Life',
+    topicVi: 'Thành phố & Đô thị',
+    icon: 'Building',
+    part1Questions: [
+      'Do you live in a big city or a small town?',
+      'What do you like most about living in a city?',
+      'Has your city changed much over the last few years?',
+      'Would you like to live in a different city in the future?'
+    ],
+    part2CueCards: [
+      {
+        title: 'Describe a city you have visited that impressed you.',
+        bulletPoints: [
+          'Which city it was and when you went there',
+          'What the main attractions were',
+          'What the atmosphere and people were like',
+          'And explain why this city left a strong impression on you'
+        ]
+      }
+    ],
+    part3Questions: [
+      'What are the major challenges faced by rapidly growing cities today?',
+      'How can urban planners make cities more green and environmentally friendly?',
+      'Do you think young people prefer living in cities compared to older generations?'
+    ]
+  },
+  {
+    id: 'map',
+    topicName: 'Maps & Navigation',
+    topicVi: 'Bản đồ & Định vị',
+    icon: 'Compass',
+    part1Questions: [
+      'Do you often use maps when traveling?',
+      'Do you prefer paper maps or digital map apps on your phone?',
+      'How good are you at reading maps?',
+      'Did you learn how to read maps when you were at school?'
+    ],
+    part2CueCards: [
+      {
+        title: 'Describe a time when you used a map to find a specific location.',
+        bulletPoints: [
+          'Where you were trying to go',
+          'What type of map you used',
+          'How easy or difficult it was to find the way',
+          'And explain how helpful the map was in that situation'
+        ]
+      }
+    ],
+    part3Questions: [
+      'How has GPS and digital mapping technology changed the way people travel?',
+      'Why is spatial orientation and map-reading still an important skill?',
+      'Do you think paper maps will become completely obsolete in the future?'
+    ]
+  },
+  {
+    id: 'noise',
+    topicName: 'Noise',
+    topicVi: 'Tiếng ồn & Âm thanh',
+    icon: 'Volume2',
+    part1Questions: [
+      'Do you mind loud noise?',
+      'What kind of noise bothers you the most?',
+      'Are there many noisy places in your neighborhood?',
+      'Where do you go when you want to enjoy some quiet time?'
+    ],
+    part2CueCards: [
+      {
+        title: 'Describe a noisy place you have been to.',
+        bulletPoints: [
+          'Where this place was',
+          'Why it was so noisy',
+          'What sounds you heard there',
+          'And explain how you felt being in that noisy environment'
+        ]
+      }
+    ],
+    part3Questions: [
+      'What are the health effects of chronic noise pollution in modern urban areas?',
+      'How can governments reduce noise pollution from traffic and construction?',
+      'Why do some people enjoy listening to ambient white noise or music while studying?'
+    ]
+  },
+  {
+    id: 'transportation',
+    topicName: 'Transportation',
+    topicVi: 'Phương tiện giao thông',
+    icon: 'Car',
+    part1Questions: [
+      'What is your preferred mode of transportation?',
+      'How do you usually commute to work or school?',
+      'Is public transport well-developed in your hometown?',
+      'Do you think transportation will change significantly in the future?'
+    ],
+    part2CueCards: [
+      {
+        title: 'Describe a trip you took using public transportation.',
+        bulletPoints: [
+          'What mode of transport you used (e.g., train, bus, metro)',
+          'Where you traveled from and to',
+          'What the journey was like',
+          'And explain whether you enjoyed using that form of transportation'
+        ]
+      }
+    ],
+    part3Questions: [
+      'How can public transit systems be made more efficient and affordable for citizens?',
+      'What impact does private vehicle transportation have on air quality?',
+      'Will autonomous self-driving vehicles become mainstream in transportation soon?'
+    ]
+  },
+  {
+    id: 'tea_coffee',
+    topicName: 'Tea or Coffee',
+    topicVi: 'Trà & Cà phê',
+    icon: 'Coffee',
+    part1Questions: [
+      'Do you prefer drinking tea or coffee?',
+      'When was the last time you drank tea or coffee?',
+      'Is serving tea or coffee to guests a common custom in your country?',
+      'Do you prefer drinking tea or coffee at home or at a coffee shop?'
+    ],
+    part2CueCards: [
+      {
+        title: 'Describe a memorable cup of tea or coffee you enjoyed.',
+        bulletPoints: [
+          'Where you had it and who prepared it',
+          'What kind of tea or coffee it was',
+          'Who you enjoyed it with',
+          'And explain why this particular beverage experience stood out to you'
+        ]
+      }
+    ],
+    part3Questions: [
+      'Why have coffee shops and cafe culture become so popular among young adults globally?',
+      'What role do tea and coffee play in hospitality and social culture in different countries?',
+      'Are there health risks associated with excessive consumption of caffeine?'
+    ]
+  },
+  {
+    id: 'fish',
+    topicName: 'Fish & Marine Life',
+    topicVi: 'Cá & Sinh vật biển',
+    icon: 'Fish',
+    part1Questions: [
+      'Do you like fish?',
+      'Have you ever been fishing?',
+      'Do you enjoy eating seafood or fish dishes?',
+      'Have you ever kept fish as pets in an aquarium?'
+    ],
+    part2CueCards: [
+      {
+        title: 'Describe an interesting fish or marine animal you have seen.',
+        bulletPoints: [
+          'What kind of fish or marine animal it was',
+          'Where you saw it (e.g., aquarium, ocean, documentary)',
+          'What it looked like and how it behaved',
+          'And explain why you found it interesting'
+        ]
+      }
+    ],
+    part3Questions: [
+      'Why is marine conservation crucial for protecting global biodiversity?',
+      'How does overfishing affect ocean ecosystems and human communities?',
+      'Why do many people find keeping fish tanks at home relaxing?'
+    ]
   }
 ];
