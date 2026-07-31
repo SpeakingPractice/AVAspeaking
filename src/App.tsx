@@ -104,14 +104,14 @@ export default function App() {
   };
 
   // Safe API fetcher with automatic retry for cold-start HTML gateway responses
-  const fetchWithRetry = async (url: string, options: RequestInit, retries = 2): Promise<any> => {
+  const fetchWithRetry = async (url: string, options: RequestInit, retries = 4): Promise<any> => {
     let lastError: Error = new Error('Kết nối thất bại');
 
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
         if (attempt > 0) {
-          // Wait 1.2s before retry
-          await new Promise((resolve) => setTimeout(resolve, 1200));
+          // Wait progressively longer (1.5s, 2.5s, 3.5s, 4.5s) for Cloud Run cold-start
+          await new Promise((resolve) => setTimeout(resolve, attempt * 1200));
         }
 
         const response = await fetch(url, options);
@@ -119,7 +119,7 @@ export default function App() {
 
         if (!contentType.includes('application/json')) {
           // Sever returned HTML (e.g. 502/503 Cloud Run warming up page)
-          throw new Error('Máy chủ AI đang khởi động lại. Hệ thống đang tự động thử lại...');
+          throw new Error('Máy chủ AI đang khởi động lại...');
         }
 
         const data = await response.json();
@@ -135,7 +135,7 @@ export default function App() {
 
     throw new Error(
       lastError.message.includes('JSON') || lastError.message.includes('khởi động')
-        ? 'Máy chủ AI vừa khởi động lại (Mã 502/503). Vui lòng bấm "Thử lại" bên dưới.'
+        ? 'Máy chủ AI vừa khởi động lại hoặc phản hồi chậm (Mã 502/503). Vui lòng bấm "Thử lại ngay" để nhận đáp án.'
         : lastError.message
     );
   };

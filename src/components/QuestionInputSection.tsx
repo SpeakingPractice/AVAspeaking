@@ -7,7 +7,7 @@ import {
   Briefcase, Smartphone, Home, Smile, Palette, Repeat, Building, Car, Shirt, Gift, Film,
   Headphones, Laugh, Eye, Sun, Music, Users, Moon, Trees, Atom, Footprints, ShoppingBag,
   Mic, Share2, Trophy, GraduationCap, CheckSquare, Plane, Watch, Droplets, Globe, Search,
-  GlassWater, Calendar, Coffee, Fish, Volume2
+  GlassWater, Calendar, Coffee, Fish, Volume2, Keyboard
 } from 'lucide-react';
 
 interface QuestionInputSectionProps {
@@ -65,7 +65,8 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Calendar: <Calendar className="w-3.5 h-3.5 text-amber-400" />,
   Coffee: <Coffee className="w-3.5 h-3.5 text-amber-600" />,
   Fish: <Fish className="w-3.5 h-3.5 text-cyan-400" />,
-  Volume2: <Volume2 className="w-3.5 h-3.5 text-indigo-400" />
+  Volume2: <Volume2 className="w-3.5 h-3.5 text-indigo-400" />,
+  Keyboard: <Keyboard className="w-3.5 h-3.5 text-purple-400" />
 };
 
 export const QuestionInputSection: React.FC<QuestionInputSectionProps> = ({

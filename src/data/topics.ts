@@ -1288,5 +1288,33 @@ export const TOPIC_PRESETS: TopicPreset[] = [
       'How does overfishing affect ocean ecosystems and human communities?',
       'Why do many people find keeping fish tanks at home relaxing?'
     ]
+  },
+  {
+    id: 'typing',
+    topicName: 'Typing & Keyboards',
+    topicVi: 'Đánh máy & Bàn phím',
+    icon: 'Keyboard',
+    part1Questions: [
+      'Do you often type on a computer or smartphone?',
+      'Did you learn how to type when you were young?',
+      'Do you prefer typing or writing by hand?',
+      'Have you ever taken a touch-typing course?'
+    ],
+    part2CueCards: [
+      {
+        title: 'Describe a time when you had to type a document or message very quickly.',
+        bulletPoints: [
+          'What document or message you were typing',
+          'Why you had to type it in a hurry',
+          'What device or keyboard you used',
+          'And explain how you felt after finishing typing it'
+        ]
+      }
+    ],
+    part3Questions: [
+      'How has digital typing affected people’s handwriting skills in modern society?',
+      'Do you think children should still be taught cursive handwriting in school?',
+      'What technological advances might replace traditional keyboards in the future?'
+    ]
   }
 ];

@@ -233,5 +233,11 @@ export const VAULT_TOPIC_VOCABULARY: VaultVocabItem[] = [
   // Fish & Marine Life
   { term: 'marine ecosystem', type: 'collocation', definition: 'hệ sinh thái biển', pronunciation: '/məˈriːn ˈiː.kəʊˌsɪs.təm/', example: 'Coral reefs play a vital role in preserving the global marine ecosystem.', topic: 'Fish & Marine Life' },
   { term: 'aquatic life', type: 'collocation', definition: 'sinh vật / đời sống dưới nước', pronunciation: '/əˈkwæt.ɪk laɪf/', example: 'Visiting aquariums allows children to observe fascinating aquatic life.', topic: 'Fish & Marine Life' },
-  { term: 'a relaxing pastime', type: 'collocation', definition: 'trò tiêu khiển thư giãn', pronunciation: '/ə rɪˈlæk.sɪŋ ˈpɑːs.taɪm/', example: 'Fishing at a tranquil lake is a popular relaxing pastime for many adults.', topic: 'Fish & Marine Life' }
+  { term: 'a relaxing pastime', type: 'collocation', definition: 'trò tiêu khiển thư giãn', pronunciation: '/ə rɪˈlæk.sɪŋ ˈpɑːs.taɪm/', example: 'Fishing at a tranquil lake is a popular relaxing pastime for many adults.', topic: 'Fish & Marine Life' },
+
+  // Typing & Keyboards
+  { term: 'touch-type efficiently', type: 'collocation', definition: 'gõ phím 10 ngón thành thạo, hiệu quả', pronunciation: '/tʌtʃ taɪp ɪˈfɪʃ.ənt.li/', example: 'Learning to touch-type efficiently has significantly boosted my daily productivity.', topic: 'Typing & Keyboards' },
+  { term: 'typewriter speed', type: 'collocation', definition: 'tốc độ đánh máy nhanh như máy đánh chữ', pronunciation: '/ˈtaɪpˌraɪ.tər spiːd/', example: 'She can type over 80 words per minute with incredible accuracy.', topic: 'Typing & Keyboards' },
+  { term: 'replace handwriting', type: 'collocation', definition: 'thay thế thói quen viết tay', pronunciation: '/rɪˈpleɪs ˈhændˌraɪ.tɪŋ/', example: 'Digital keyboards have largely replaced handwriting in modern workplaces.', topic: 'Typing & Keyboards' },
+  { term: 'autocorrect feature', type: 'collocation', definition: 'tính năng tự động sửa lỗi chính tả', pronunciation: '/ˈɔː.təʊ.kəˈrekt ˈfiː.tʃər/', example: 'The autocorrect feature on smartphones helps fix minor typos instantly.', topic: 'Typing & Keyboards' }
 ];
