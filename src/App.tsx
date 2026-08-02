@@ -292,16 +292,26 @@ export default function App() {
                 {errorMessage}
               </div>
             </div>
-            {lastPayload && (
-              <button
-                onClick={() => handleAnalyzeQuestion(lastPayload)}
-                disabled={isLoadingCoach}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-semibold rounded-xl flex items-center gap-2 shrink-0 transition-all cursor-pointer text-xs"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isLoadingCoach ? 'animate-spin' : ''}`} />
-                {isLoadingCoach ? 'Đang thử lại...' : 'Thử lại ngay'}
-              </button>
-            )}
+            <div className="flex items-center gap-2 shrink-0">
+              {!userApiKey && (
+                <button
+                  onClick={() => setIsApiKeyModalOpen(true)}
+                  className="px-3 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-medium rounded-xl text-xs transition-all cursor-pointer"
+                >
+                  Nhập API Key cá nhân
+                </button>
+              )}
+              {lastPayload && (
+                <button
+                  onClick={() => handleAnalyzeQuestion(lastPayload)}
+                  disabled={isLoadingCoach}
+                  className="px-4 py-2 bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-semibold rounded-xl flex items-center gap-2 transition-all cursor-pointer text-xs"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isLoadingCoach ? 'animate-spin' : ''}`} />
+                  {isLoadingCoach ? 'Đang thử lại...' : 'Thử lại ngay'}
+                </button>
+              )}
+            </div>
           </div>
         )}
 

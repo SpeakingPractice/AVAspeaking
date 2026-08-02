@@ -152,18 +152,35 @@ app.post('/api/speaking-coach', async (req, res) => {
       userPrompt += `Bối cảnh / Yêu cầu thêm từ người học: ${customContext}\n`;
     }
 
-    const response = await callGeminiWithRetry(() =>
-      ai.models.generateContent({
-        model: 'gemini-3.6-flash',
-        contents: userPrompt,
-        config: {
-          systemInstruction: SYSTEM_PROMPT,
-          responseMimeType: 'application/json',
-          responseSchema: COACH_RESPONSE_SCHEMA,
-          temperature: 0.7,
-        }
-      })
-    );
+    let response;
+    try {
+      response = await callGeminiWithRetry(() =>
+        ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: userPrompt,
+          config: {
+            systemInstruction: SYSTEM_PROMPT,
+            responseMimeType: 'application/json',
+            responseSchema: COACH_RESPONSE_SCHEMA,
+            temperature: 0.7,
+          }
+        })
+      );
+    } catch (primaryError) {
+      console.warn('Primary model gemini-2.5-flash failed/timed out, attempting fallback to gemini-2.0-flash...', primaryError);
+      response = await callGeminiWithRetry(() =>
+        ai.models.generateContent({
+          model: 'gemini-2.0-flash',
+          contents: userPrompt,
+          config: {
+            systemInstruction: SYSTEM_PROMPT,
+            responseMimeType: 'application/json',
+            responseSchema: COACH_RESPONSE_SCHEMA,
+            temperature: 0.7,
+          }
+        })
+      );
+    }
 
     const jsonText = response.text || '{}';
     const resultData = JSON.parse(jsonText);
