@@ -27,6 +27,24 @@ function getGeminiClient(customKey?: string): GoogleGenAI {
   });
 }
 
+// Helper to retry Gemini calls if transient network drops occur
+async function callGeminiWithRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 1000): Promise<T> {
+  let lastErr: any;
+  for (let i = 0; i <= retries; i++) {
+    try {
+      if (i > 0) {
+        console.log(`Retrying Gemini API call (attempt ${i + 1}/${retries + 1})...`);
+        await new Promise((r) => setTimeout(r, delayMs * i));
+      }
+      return await fn();
+    } catch (err: any) {
+      console.warn(`Gemini API call attempt ${i + 1} failed:`, err?.message || String(err));
+      lastErr = err;
+    }
+  }
+  throw lastErr;
+}
+
 // System prompt for IELTS Speaking Coach
 const SYSTEM_PROMPT = `
 Bạn là một giáo viên IELTS Speaking bản ngữ chuyên nghiệp, có kinh nghiệm luyện thi cho học viên Việt Nam nâng band điểm từ 5.5 lên 7.0 - 8.0+.
@@ -134,16 +152,18 @@ app.post('/api/speaking-coach', async (req, res) => {
       userPrompt += `Bối cảnh / Yêu cầu thêm từ người học: ${customContext}\n`;
     }
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
-      contents: userPrompt,
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
-        responseMimeType: 'application/json',
-        responseSchema: COACH_RESPONSE_SCHEMA,
-        temperature: 0.7,
-      }
-    });
+    const response = await callGeminiWithRetry(() =>
+      ai.models.generateContent({
+        model: 'gemini-3.6-flash',
+        contents: userPrompt,
+        config: {
+          systemInstruction: SYSTEM_PROMPT,
+          responseMimeType: 'application/json',
+          responseSchema: COACH_RESPONSE_SCHEMA,
+          temperature: 0.7,
+        }
+      })
+    );
 
     const jsonText = response.text || '{}';
     const resultData = JSON.parse(jsonText);
@@ -345,9 +365,11 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on http://0.0.0.0:${PORT}`);
   });
+  server.keepAliveTimeout = 65000;
+  server.headersTimeout = 66000;
 }
 
 startServer();
