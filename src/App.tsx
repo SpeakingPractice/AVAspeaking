@@ -118,21 +118,13 @@ export default function App() {
   };
 
   // Safe API fetcher with automatic retry for cold-start HTML gateway responses
-  const fetchWithRetry = async (url: string, options: RequestInit, retries = 6): Promise<any> => {
+  const fetchWithRetry = async (url: string, options: RequestInit, retries = 4): Promise<any> => {
     let lastError: Error = new Error('Kết nối thất bại');
-
-    // Pre-warm gateway before sending heavy POST payload
-    try {
-      await fetch('/api/health');
-    } catch (e) {
-      // Ignored pre-warm error
-    }
 
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
         if (attempt > 0) {
-          // Wait progressively (1s, 1.5s, 2s, 3s, 4s, 5s) for Cloud Run cold-start or gateway recovery
-          const delay = Math.min(attempt * 1000, 5000);
+          const delay = Math.min(attempt * 1000, 4000);
           await new Promise((resolve) => setTimeout(resolve, delay));
         }
 
@@ -146,18 +138,23 @@ export default function App() {
 
         const data = await response.json();
         if (!response.ok || !data.success) {
-          throw new Error(data.error || 'Máy chủ phản hồi lỗi không xác định.');
+          const apiError = new Error(data.details || data.error || 'Máy chủ phản hồi lỗi không xác định.');
+          (apiError as any).isAppError = true;
+          throw apiError;
         }
 
         return data;
       } catch (err: any) {
         lastError = err;
+        if (err?.isAppError) {
+          break; // Immediate fail on explicit API error response
+        }
       }
     }
 
     throw new Error(
-      lastError.message.includes('JSON') || lastError.message.includes('khởi động')
-        ? 'Máy chủ AI vừa khởi động lại hoặc phản hồi chậm (Mã 502/503). Vui lòng bấm "Thử lại ngay" bên dưới.'
+      lastError.message.includes('khởi động')
+        ? 'Máy chủ AI đang khởi động lại (Mã 502/503). Vui lòng bấm "Thử lại ngay" sau vài giây.'
         : lastError.message
     );
   };

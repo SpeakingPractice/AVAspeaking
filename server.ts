@@ -156,7 +156,7 @@ app.post('/api/speaking-coach', async (req, res) => {
     try {
       response = await callGeminiWithRetry(() =>
         ai.models.generateContent({
-          model: 'gemini-2.5-flash',
+          model: 'gemini-3.6-flash',
           contents: userPrompt,
           config: {
             systemInstruction: SYSTEM_PROMPT,
@@ -167,10 +167,10 @@ app.post('/api/speaking-coach', async (req, res) => {
         })
       );
     } catch (primaryError) {
-      console.warn('Primary model gemini-2.5-flash failed/timed out, attempting fallback to gemini-2.0-flash...', primaryError);
+      console.warn('Primary model gemini-3.6-flash failed/timed out, attempting fallback to gemini-flash-latest...', primaryError);
       response = await callGeminiWithRetry(() =>
         ai.models.generateContent({
-          model: 'gemini-2.0-flash',
+          model: 'gemini-flash-latest',
           contents: userPrompt,
           config: {
             systemInstruction: SYSTEM_PROMPT,
