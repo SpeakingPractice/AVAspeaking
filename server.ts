@@ -14,8 +14,8 @@ app.use(express.json({ limit: '10mb' }));
 // Function to instantiate Gemini client with optional custom user API Key
 function getGeminiClient(customKey?: string): GoogleGenAI {
   const apiKey = customKey?.trim() || process.env.GEMINI_API_KEY || '';
-  if (!apiKey) {
-    throw new Error('Chưa cấu hình Gemini API Key. Vui lòng kiểm tra lại Key hoặc nhập Gemini API Key cá nhân.');
+  if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
+    throw new Error('Chưa cấu hình Gemini API Key. Vui lòng bấm nút "Nhập API Key cá nhân" bên dưới để nhập API Key của bạn.');
   }
   return new GoogleGenAI({
     apiKey,
@@ -27,22 +27,61 @@ function getGeminiClient(customKey?: string): GoogleGenAI {
   });
 }
 
-// Helper to retry Gemini calls if transient network drops occur
-async function callGeminiWithRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 1000): Promise<T> {
-  let lastErr: any;
-  for (let i = 0; i <= retries; i++) {
+// Helper to call Gemini with timeout and model fallback
+async function callGeminiModel(
+  ai: GoogleGenAI,
+  contents: string,
+  systemInstruction: string | undefined,
+  responseSchema: any,
+  temperature = 0.7,
+  timeoutMs = 25000
+): Promise<string> {
+  const modelsToTry = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-3.0-flash'];
+  let lastError: any;
+
+  for (const model of modelsToTry) {
+    let timer: NodeJS.Timeout | undefined;
     try {
-      if (i > 0) {
-        console.log(`Retrying Gemini API call (attempt ${i + 1}/${retries + 1})...`);
-        await new Promise((r) => setTimeout(r, delayMs * i));
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`Thời gian chờ API Gemini (${model}) quá lâu.`)), timeoutMs);
+      });
+
+      const generatePromise = ai.models.generateContent({
+        model,
+        contents,
+        config: {
+          systemInstruction,
+          responseMimeType: 'application/json',
+          responseSchema,
+          temperature,
+        }
+      });
+
+      const response = await Promise.race([generatePromise, timeoutPromise]);
+      if (timer) clearTimeout(timer);
+      if (response && response.text) {
+        return response.text;
       }
-      return await fn();
     } catch (err: any) {
-      console.warn(`Gemini API call attempt ${i + 1} failed:`, err?.message || String(err));
-      lastErr = err;
+      if (timer) clearTimeout(timer);
+      const errMsg = err?.message || String(err);
+      console.warn(`Model ${model} failed:`, errMsg);
+      lastError = err;
+
+      // Fail fast if API key is invalid or quota exceeded
+      if (
+        errMsg.includes('API_KEY') ||
+        errMsg.includes('403') ||
+        errMsg.includes('quota') ||
+        errMsg.includes('Quota') ||
+        errMsg.includes('Chưa cấu hình')
+      ) {
+        throw new Error('API Key không hợp lệ hoặc đã hết hạn ngạch (Quota). Vui lòng kiểm tra lại Key hoặc bấm "Nhập API Key cá nhân".');
+      }
     }
   }
-  throw lastErr;
+
+  throw lastError || new Error('Không thể kết nối với dịch vụ Gemini AI.');
 }
 
 // System prompt for IELTS Speaking Coach
@@ -152,37 +191,13 @@ app.post('/api/speaking-coach', async (req, res) => {
       userPrompt += `Bối cảnh / Yêu cầu thêm từ người học: ${customContext}\n`;
     }
 
-    let response;
-    try {
-      response = await callGeminiWithRetry(() =>
-        ai.models.generateContent({
-          model: 'gemini-3.6-flash',
-          contents: userPrompt,
-          config: {
-            systemInstruction: SYSTEM_PROMPT,
-            responseMimeType: 'application/json',
-            responseSchema: COACH_RESPONSE_SCHEMA,
-            temperature: 0.7,
-          }
-        })
-      );
-    } catch (primaryError) {
-      console.warn('Primary model gemini-3.6-flash failed/timed out, attempting fallback to gemini-flash-latest...', primaryError);
-      response = await callGeminiWithRetry(() =>
-        ai.models.generateContent({
-          model: 'gemini-flash-latest',
-          contents: userPrompt,
-          config: {
-            systemInstruction: SYSTEM_PROMPT,
-            responseMimeType: 'application/json',
-            responseSchema: COACH_RESPONSE_SCHEMA,
-            temperature: 0.7,
-          }
-        })
-      );
-    }
-
-    const jsonText = response.text || '{}';
+    const jsonText = await callGeminiModel(
+      ai,
+      userPrompt,
+      SYSTEM_PROMPT,
+      COACH_RESPONSE_SCHEMA,
+      0.7
+    );
     const resultData = JSON.parse(jsonText);
 
     res.json({ success: true, data: resultData });
@@ -274,17 +289,15 @@ Yêu cầu:
 5. Giải thích nhận xét bằng TIẾNG VIỆT gần gũi, mang tính xây dựng.
 `;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: EVALUATION_SCHEMA,
-        temperature: 0.5,
-      }
-    });
+    const jsonText = await callGeminiModel(
+      ai,
+      prompt,
+      undefined,
+      EVALUATION_SCHEMA,
+      0.5
+    );
 
-    const resultData = JSON.parse(response.text || '{}');
+    const resultData = JSON.parse(jsonText);
     res.json({ success: true, data: resultData });
   } catch (error: any) {
     console.error('Error evaluating answer:', error);
@@ -315,32 +328,32 @@ app.post('/api/generate-questions', async (req, res) => {
 Trả về JSON gồm 3 trường: part1Question, part2CueCard (object: title, bulletPoints: string[]), part3Question.
 `;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
+    const QUESTIONS_SCHEMA = {
+      type: Type.OBJECT,
+      properties: {
+        part1Question: { type: Type.STRING },
+        part2CueCard: {
           type: Type.OBJECT,
           properties: {
-            part1Question: { type: Type.STRING },
-            part2CueCard: {
-              type: Type.OBJECT,
-              properties: {
-                title: { type: Type.STRING },
-                bulletPoints: { type: Type.ARRAY, items: { type: Type.STRING } }
-              },
-              required: ['title', 'bulletPoints']
-            },
-            part3Question: { type: Type.STRING }
+            title: { type: Type.STRING },
+            bulletPoints: { type: Type.ARRAY, items: { type: Type.STRING } }
           },
-          required: ['part1Question', 'part2CueCard', 'part3Question']
+          required: ['title', 'bulletPoints']
         },
-        temperature: 0.7
-      }
-    });
+        part3Question: { type: Type.STRING }
+      },
+      required: ['part1Question', 'part2CueCard', 'part3Question']
+    };
 
-    const data = JSON.parse(response.text || '{}');
+    const jsonText = await callGeminiModel(
+      ai,
+      prompt,
+      undefined,
+      QUESTIONS_SCHEMA,
+      0.7
+    );
+
+    const data = JSON.parse(jsonText);
     res.json({ success: true, data });
   } catch (error: any) {
     console.error('Error generating questions:', error);
